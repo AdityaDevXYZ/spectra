@@ -1,5 +1,5 @@
 # India High School Exoplanet Data Challenge - Final Report
-**Team Name:** [Your Team Name]
+**Team Name:** NECTRRA
 **Project Title:** Spectra: Beyond the Black Box with Physics-Informed Neural Networks
 
 ## 1. A Systems-Level Approach to Data Ingestion
