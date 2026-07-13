@@ -1,0 +1,8 @@
+torch>=2.0.0
+numpy
+pandas
+polars
+umap-learn
+plotly
+matplotlib
+scikit-learn
