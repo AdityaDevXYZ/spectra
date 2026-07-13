@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>🌌 Beyond the Black Box: Physics-Informed Exoplanet Detection</h1>
+  <h1>🌌 Spectra: Physics-Informed Exoplanet Detection</h1>
   <p><b>India High School Exoplanet Data Challenge Submission</b></p>
   
   [![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://python.org)
@@ -43,20 +43,20 @@ Make sure you have Docker installed.
 
 ```bash
 # Clone the repository
-git clone https://github.com/AdityaDevXYZ/india-exoplanet-challenge.git
-cd india-exoplanet-challenge
+git clone https://github.com/AdityaDevXYZ/spectra.git
+cd spectra
 
 # Build the environment (Compiles the Rust engine and installs PyTorch)
-docker build -t exoplanet-pinn .
+docker build -t spectra .
 
 # Run the end-to-end pipeline
-docker run exoplanet-pinn
+docker run spectra
 ```
 
 ### Option 2: Run via Google Colab (Zero-Setup Cloud Execution)
 We have provided a pre-configured Google Colab notebook that automatically downloads this repository, installs all dependencies, and executes the Physics-Informed Neural Network and UMAP topology mapper in the cloud.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AdityaDevXYZ/india-exoplanet-challenge/blob/main/Colab_Runner.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AdityaDevXYZ/spectra/blob/main/Colab_Runner.ipynb)
 
 Simply click the badge above, press "Run All", and view the generated metrics and interactive topological maps!
 
