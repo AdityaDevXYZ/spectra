@@ -53,11 +53,12 @@ docker build -t exoplanet-pinn .
 docker run exoplanet-pinn
 ```
 
-### Option 2: Run via Google Colab / Native Python
-If you cannot build the Rust module, the Python code has a built-in graceful fallback to `pandas`.
-1. Upload the `src/` and `data/` folders to Google Colab.
-2. Install requirements: `pip install -r requirements.txt`
-3. Run `python src/train_advanced.py`
+### Option 2: Run via Google Colab (Zero-Setup Cloud Execution)
+We have provided a pre-configured Google Colab notebook that automatically downloads this repository, installs all dependencies, and executes the Physics-Informed Neural Network and UMAP topology mapper in the cloud.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AdityaDevXYZ/india-exoplanet-challenge/blob/main/Colab_Runner.ipynb)
+
+Simply click the badge above, press "Run All", and view the generated metrics and interactive topological maps!
 
 ## 📊 Outputs
 Running the pipeline will automatically generate:
