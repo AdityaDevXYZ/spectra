@@ -73,11 +73,23 @@ def main():
     print("✅ Training Complete.")
     
     # Evaluation and UMAP Latent Space Mapping
-    print("🌌 Mapping Latent Space via UMAP...")
+    print("🌌 Evaluating Model and Mapping Latent Space via UMAP...")
     model.eval()
     with torch.no_grad():
         logits, embeddings = model(X_test_t)
         predictions = torch.argmax(logits, dim=1).numpy()
+        
+    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+    acc = accuracy_score(y_test, predictions)
+    prec = precision_score(y_test, predictions, average='weighted', zero_division=0)
+    rec = recall_score(y_test, predictions, average='weighted', zero_division=0)
+    f1 = f1_score(y_test, predictions, average='weighted', zero_division=0)
+    print("\n--- 🏆 FINAL MODEL METRICS ---")
+    print(f"Accuracy:  {acc:.4f}")
+    print(f"Precision: {prec:.4f}")
+    print(f"Recall:    {rec:.4f}")
+    print(f"F1-Score:  {f1:.4f}")
+    print("------------------------------\n")
     
     # Fit UMAP on the neural network's internal representation
     reducer = umap.UMAP(n_neighbors=15, min_dist=0.1, random_state=42)
