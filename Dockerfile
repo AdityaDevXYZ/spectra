@@ -25,7 +25,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Build the Rust extension using maturin
 RUN pip install maturin
 WORKDIR /app/rust_ingest
-RUN maturin develop --release
+RUN maturin build --release
+RUN pip install target/wheels/*.whl
 
 # Return to main app directory
 WORKDIR /app
