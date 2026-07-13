@@ -15,12 +15,12 @@ def main():
     try:
         # Import our compiled Rust module
         import rust_ingest
-        df_polars = rust_ingest.process_exoplanet_data("../data/KOI_Cumulative_clean.csv")
+        df_polars = rust_ingest.process_exoplanet_data("data/KOI_Cumulative_clean.csv")
         df = df_polars.to_pandas()
         print("✅ Rust Ingestion Complete. Data processed in memory-safe dataframe.")
     except ImportError:
         print("⚠️ Rust module not found. Falling back to pandas (Make sure to build Docker image!)")
-        df = pd.read_csv("../data/KOI_Cumulative_clean.csv")
+        df = pd.read_csv("data/KOI_Cumulative_clean.csv")
         cols_to_drop = ["rowid", "kepid", "kepoi_name", "kepler_name", "koi_disp_prov", "koi_comment", "koi_tce_delivname", "koi_fwm_stat_sig"]
         df = df.drop(columns=[c for c in cols_to_drop if c in df.columns], errors='ignore')
 
@@ -91,12 +91,12 @@ def main():
         'Predicted_Label': label_encoder.inverse_transform(predictions)
     })
     
-    os.makedirs("../reports/figures", exist_ok=True)
+    os.makedirs("reports/figures", exist_ok=True)
     
     fig = px.scatter(plot_df, x='UMAP_X', y='UMAP_Y', color='True_Label', 
                      symbol='Predicted_Label', title='PINN Latent Space Embedding (UMAP)',
                      hover_data=['Predicted_Label'])
-    fig.write_html("../reports/figures/latent_space_map.html")
+    fig.write_html("reports/figures/latent_space_map.html")
     print("📊 Latent Space Interactive Map saved to reports/figures/latent_space_map.html")
 
 if __name__ == "__main__":
