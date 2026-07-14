@@ -11,7 +11,7 @@
 ---
 
 ## 🚀 The Vision
-To win the India High School Exoplanet Data Challenge, we abandoned the standard tabular data playbook. Instead of a basic Pandas + Scikit-learn pipeline, we bridged **systems-level software engineering** with **advanced astrophysics** to build an architecture that belongs in a research paper.
+To solve the challenge of accurately filtering exoplanet signals from deep space noise, we abandoned the standard tabular data playbook. Instead of a basic Pandas + Scikit-learn pipeline, we bridged **systems-level software engineering** with **advanced astrophysics** to build an architecture that belongs in a research paper.
 
 This repository features a compiled **Rust data ingestion engine** and a **Physics-Informed Tabular Attention Network (PyTorch)** that physically validates its predictions against Keplerian geometry.
 Spectra is an enterprise-grade, end-to-end Machine Learning architecture designed to classify exoplanet candidates from the Kepler KOI dataset (9,564 samples, 140 features). Instead of relying on standard "black box" models, Spectra combines systems-level data engineering with a **Physics-Informed Neural Network (PINN)** to evaluate data through the lens of orbital mechanics.
@@ -36,7 +36,7 @@ We did not choose our architecture simply because it sounds advanced; we chose i
 **4. Physics-Informed Loss Penalties**
 The final performance bump came from our custom loss function, which penalizes predictions that violate astrophysics:
 $$ \mathcal{L}_{total} = \mathcal{L}_{BCE}(y, \hat{y}) + \lambda \sum_{i} \text{Penalty}(x_i) $$
-Specifically, we enforce Transit Depth Geometry. If the network predicts a CONFIRMED planet, but the observed transit depth (`koi_depth`) drastically contradicts the theoretical depth calculated from the radii ratio ($(\text{koi\_prad} / \text{koi\_srad})^2$), we apply a Mean Squared Error penalty. Using an empirically tuned $\lambda = 0.1$, this physics constraint directly reduced false-positive classifications.
+Specifically, we enforce Transit Depth Geometry. If the network predicts a CONFIRMED planet, but the observed transit depth (`koi_depth`) drastically contradicts the theoretical depth calculated from the radii ratio ($(R_{planet} / R_{star})^2$), we apply a Mean Squared Error penalty. Using an empirically tuned $\lambda = 0.1$, this physics constraint directly reduced false-positive classifications.
 
 ## 🏗️ The Three-Pillar Architecture
 
