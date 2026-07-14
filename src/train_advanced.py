@@ -21,7 +21,7 @@ def main():
     except ImportError:
         print("⚠️ Rust module not found. Falling back to pandas (Make sure to build Docker image!)")
         df = pd.read_csv("data/KOI_Cumulative_clean.csv")
-        cols_to_drop = ["rowid", "kepid", "kepoi_name", "kepler_name", "koi_disp_prov", "koi_comment", "koi_tce_delivname", "koi_fwm_stat_sig"]
+        cols_to_drop = ["rowid", "kepid", "kepoi_name", "kepler_name", "koi_disp_prov", "koi_comment", "koi_tce_delivname", "koi_fwm_stat_sig", "koi_fpflag_nt", "koi_fpflag_ss", "koi_fpflag_co", "koi_fpflag_ec"]
         df = df.drop(columns=[c for c in cols_to_drop if c in df.columns], errors='ignore')
 
     # Minimal Preprocessing

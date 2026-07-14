@@ -20,7 +20,8 @@ fn process_exoplanet_data(file_path: &str) -> PyResult<PyDataFrame> {
     // We drop non-predictive columns to save memory
     let cols_to_drop = vec![
         "rowid", "kepid", "kepoi_name", "kepler_name", 
-        "koi_disp_prov", "koi_comment", "koi_tce_delivname", "koi_fwm_stat_sig"
+        "koi_disp_prov", "koi_comment", "koi_tce_delivname", "koi_fwm_stat_sig",
+        "koi_fpflag_nt", "koi_fpflag_ss", "koi_fpflag_co", "koi_fpflag_ec"
     ];
     
     let mut cleaned_df = df.drop_many(&cols_to_drop);
