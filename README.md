@@ -105,7 +105,7 @@ ROC AUC:   0.7716
 
     CANDIDATE       0.35      0.62      0.44      404
     CONFIRMED       0.76      0.53      0.62      570
-FALSE POSITIVE      0.75      0.64      0.69       939
+FALSE POSITIVE      0.75      0.64      0.69      939
 ```
 
 ---
