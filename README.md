@@ -1,92 +1,47 @@
-<div align="center">
-  <h1>🌌 Spectra: Physics-Informed Exoplanet Detection</h1>
-  <p><b>India High School Exoplanet Data Challenge Submission</b></p>
-  
-  [![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://python.org)
-  [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg)](https://pytorch.org/)
-  [![Rust](https://img.shields.io/badge/Rust-1.68+-orange.svg)](https://www.rust-lang.org/)
-  [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
-</div>
+# Spectra: Physics-Informed Exoplanet Classification
 
----
+## 1. Introduction
+**Challenge:** Accurately filtering exoplanet signals from deep space noise in the Kepler dataset.
+**Goal:** The project combines systems programming with physics-informed machine learning to build a reproducible pipeline that evaluates candidates based on orbital mechanics, rather than solely relying on statistical correlations.
 
-## 🚀 The Vision
-To solve the challenge of accurately filtering exoplanet signals from deep space noise, we abandoned the standard tabular data playbook. Instead of a basic Pandas + Scikit-learn pipeline, we bridged **systems-level software engineering** with **advanced astrophysics** to build an architecture that belongs in a research paper.
+## 2. Dataset & Data Cleaning
+We utilized the Kepler KOI catalog to train our models.
+* **Dataset Statistics:** 9,564 observations, 140 original features.
+* **Leakage Removal:** We explicitly removed 4 target leakage columns (`koi_fpflag_nt`, `koi_fpflag_ss`, `koi_fpflag_co`, `koi_fpflag_ec`) because they are generated post-analysis. 
+* **Pruning:** 8 additional non-predictive metadata columns removed.
+* **Missing Values:** Imputed using the median for numeric and mode for categorical columns.
+* **Evaluation Split:** 80/20 Train/Test split.
 
-This repository features a compiled **Rust data ingestion engine** and a **Physics-Informed Tabular Attention Network (PyTorch)** that physically validates its predictions against Keplerian geometry.
-Spectra is an enterprise-grade, end-to-end Machine Learning architecture designed to classify exoplanet candidates from the Kepler KOI dataset (9,564 samples, 140 features). Instead of relying on standard "black box" models, Spectra combines systems-level data engineering with a **Physics-Informed Neural Network (PINN)** to evaluate data through the lens of orbital mechanics.
+**Rust Preprocessing for Anomalies**
+We used Rust (via the Polars framework) because the dataset contains malformed numeric values that require strict parsing. At byte offset 500,6433 in `koi_quarters`, a 34-digit anomaly breaks standard parsing by forcing columns into object types. Our Rust engine enforces strict `i64` typing, isolating the overflow safely before it reaches the numerical scaler.
 
-## 🔬 Scientific Methodology & Validation
+## 3. Model Development
+**Why Attention?**
+Attention allows the model to learn interactions between stellar and planetary parameters, such as the relationship between stellar radius, planetary radius, and transit depth. We implemented a `TabularAttentionNetwork` using PyTorch.
 
-**1. Eradicating Target Leakage (Sacrificing Score for Science)**
-A standard pandas pipeline applied to the Kepler dataset will easily achieve >99% accuracy. However, this is an illusion caused by target leakage. The `koi_fpflag_nt`, `koi_fpflag_ss`, `koi_fpflag_co`, and `koi_fpflag_ec` columns are False Positive Flags determined *after* initial human/algorithmic analysis. We explicitly dropped these 4 columns (along with 8 non-predictive metadata columns). We intentionally sacrificed a 0.99 leaderboard score to achieve a mathematically honest **F1-Score of 0.5608**. 
+**Physics-Informed Loss**
+During training, the network receives an additional penalty when predicted planetary parameters violate the expected transit depth relationship $\Delta F/F \approx (R_p/R_*)^2$. This encourages the model to learn physically plausible decision boundaries instead of relying solely on statistical correlations.
 
-**2. The 34-Digit Anomaly (Why Rust?)**
-At byte offset 500,6433 in the `koi_quarters` column, the dataset contains the anomalous 34-digit integer `'1111111111111111111000000000000000'`. Standard Python `pandas` handles this by casting the entire column to a generic `Object` (String). While manageable, this breaks automated downstream numerical scaling by forcing numeric data into categorical encoders. Our custom **Rust / Polars** engine enforces strict `i64` typing, immediately isolating the overflow and safely casting the single anomalous value to `null` via `.with_ignore_errors(true)`.
+## 4. Experimental Results
+**Model Comparison & Ablation Studies**
+To justify our architecture, we measured the Macro F1-Score of various models on the strict, leakage-free dataset.
 
-**3. Ablation Study: Why Attention over XGBoost?**
-We did not choose our architecture simply because it sounds advanced; we chose it because it solved specific physical challenges. Exoplanet physics relies on complex cross-feature relationships. We hypothesized that PyTorch's `MultiheadAttention` would intrinsically map these physical correlations better than orthogonal tree-based splits. 
+| Model / Experiment | Macro F1 |
+| :--- | :--- |
+| Baseline (Logistic Regression) | 0.492 |
+| Tree-Based (XGBoost) | 0.531 |
+| Tabular Attention (No Physics) | 0.548 |
+| **Attention + Physics Loss (Spectra)** | **0.561** |
 
-*Quantitative Proof (Macro F1-Score on pristine data):*
-* **Baseline (Logistic Regression):** 0.492
-* **Tree-Based (XGBoost):** 0.531
-* **Tabular Attention (No Physics Loss):** 0.548
-* **Spectra PINN (Attention + Physics Loss):** **0.561**
+**Ablation Study Summary:**
+* **Physics Loss:** Increased F1 by ~0.013 by reducing physically impossible false positives.
+* **UMAP Visualization:** No effect on accuracy, but drastically improves interpretability of the latent space.
 
-**4. Physics-Informed Loss Penalties**
-The final performance bump came from our custom loss function, which penalizes predictions that violate astrophysics:
-$$ \mathcal{L}_{total} = \mathcal{L}_{BCE}(y, \hat{y}) + \lambda \sum_{i} \text{Penalty}(x_i) $$
-Specifically, we enforce Transit Depth Geometry. If the network predicts a CONFIRMED planet, but the observed transit depth (`koi_depth`) drastically contradicts the theoretical depth calculated from the radii ratio ($(R_{planet} / R_{star})^2$), we apply a Mean Squared Error penalty. Using an empirically tuned $\lambda = 0.1$, this physics constraint directly reduced false-positive classifications.
+**Failure Analysis**
+Most incorrect predictions occurred between CONFIRMED and CANDIDATE objects. This is scientifically expected because candidate objects are mathematically ambiguous and inherently share nearly all characteristics with confirmed planets until manual spectroscopic follow-up is performed.
 
-## 🏗️ The Three-Pillar Architecture
+## 5. Explainability
+To understand what our AI learned, we extracted the 128-dimensional embeddings from the neural network and used **UMAP** to project them into a 2D interactive map. This visually proves that the network successfully isolated real planets into distinct manifolds.
 
-### 1. Systems-Level Data Ingestion (Rust + Polars)
-Astronomical datasets are massive and notoriously noisy. While other pipelines wait minutes for Python to process data, our preprocessing is handled in **Rust**.
-- We built a native extension using `PyO3` and `Polars`.
-- It executes high-throughput CSV parsing, NaN imputation, and memory-safe cleaning in milliseconds.
-- Bypasses the Global Interpreter Lock (GIL) before the data ever reaches the ML model.
-
-### 2. Physics-Informed Neural Network (PINN)
-Standard machine learning models are "black boxes"—they fit data without understanding space. 
-- We built a **Tabular Attention Network** using Multi-head Self-Attention in PyTorch.
-- **Custom Physics Loss Function:** The model does not just minimize cross-entropy; it is penalized if it flags a transit candidate that violates basic physical geometry (e.g., if the transit duration is physically impossible for a planetary orbit given the star's properties).
-
-### 3. Explainability via Latent Space Mapping
-A basic confusion matrix isn't enough. To prove our AI actually learned the difference between an eclipsing binary and a real planet:
-- We extract the 128-dimensional embeddings from the penultimate layer of the Neural Network.
-- Using **UMAP**, we project these high-dimensional "thoughts" down to an interactive 2D topological map.
-- The resulting visualization proves the network successfully clustered real planets away from false-positive binary stars.
-
-## 🛠️ Reproducibility (Run it Yourself)
-
-We treat this project like an enterprise software release. You do not need to struggle with installing Rust compilers or PyTorch environments. The entire project is containerized.
-
-### Option 1: One-Click Docker Execution (Recommended)
-Make sure you have Docker installed.
-
-```bash
-# Clone the repository
-git clone https://github.com/AdityaDevXYZ/spectra.git
-cd spectra
-
-# Build the environment (Compiles the Rust engine and installs PyTorch)
-docker build -t spectra .
-
-# Run the end-to-end pipeline
-docker run spectra
-```
-
-### Option 2: Run via Google Colab (Zero-Setup Cloud Execution)
-We have provided a pre-configured Google Colab notebook that automatically downloads this repository, installs all dependencies, and executes the Physics-Informed Neural Network and UMAP topology mapper in the cloud.
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/AdityaDevXYZ/spectra/blob/main/Colab_Runner.ipynb)
-
-Simply click the badge above, press "Run All", and view the generated metrics and interactive topological maps!
-
-## 📊 Outputs
-Running the pipeline will automatically generate:
-1. Console outputs with **Accuracy, Precision, Recall, and F1-Score**.
-2. An interactive `latent_space_map.html` in the `reports/figures/` directory showing the AI's topological brain mapping.
-
----
-*Built for the India High School Exoplanet Data Challenge*
+## 6. Reproducibility
+We used Docker to ensure that the complete training pipeline (including compiling the Rust bindings) is reproducible across any operating system. We also provided a Google Colab notebook for instant execution.
