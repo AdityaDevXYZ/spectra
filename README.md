@@ -40,6 +40,15 @@ Attention allows the model to learn interactions between stellar and planetary p
 | Tabular Attention (No Physics) | 0.548 |
 | **Attention + Physics Loss (Spectra)** | **0.561** |
 
+```text
+Visual Ablation Comparison (Macro F1)
+
+Logistic        ███████████
+XGBoost         ███████████████
+Attention       █████████████████
+Spectra         ██████████████████
+```
+
 ### 4. Physics-Informed Loss Penalties
 During training, the network receives an additional penalty when predicted planetary parameters violate the expected transit depth relationship $\Delta F/F \approx (R_p/R_*)^2$. This encourages the model to learn physically plausible decision boundaries instead of relying solely on statistical correlations.
 

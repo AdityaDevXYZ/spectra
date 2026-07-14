@@ -28,6 +28,15 @@ We hypothesized that a **Physics-Informed Neural Network (PINN)** using `nn.Mult
 | Tabular Attention (No Physics) | 0.548 |
 | **Attention + Physics Loss (Spectra)** | **0.561** |
 
+```text
+Visual Ablation Comparison (Macro F1)
+
+Logistic        ███████████
+XGBoost         ███████████████
+Attention       █████████████████
+Spectra         ██████████████████
+```
+
 The final performance bump is directly attributed to our custom physics loss function. Specifically, if the model predicts a CONFIRMED planet, but the observed transit depth (`koi_depth`) drastically violates the geometric radii ratio ($\Delta F / F \approx (R_p / R_*)^2$), we apply an additional penalty ($\lambda = 0.1$). This mathematically forces the AI to not just fit the data, but to genuinely understand planetary geometry.
 
 ## 4. Final Evaluation Metrics
