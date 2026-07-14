@@ -71,10 +71,29 @@ We have provided a pre-configured Google Colab notebook for instant execution wi
 
 Simply click the badge above, press "Run All", and view the generated metrics and interactive topological maps!
 
-## 📊 Outputs
-Running the pipeline will automatically generate:
-1. Console outputs with **Accuracy, Precision, Recall, and F1-Score**.
-2. An interactive `latent_space_map.html` in the `reports/figures/` directory showing the AI's topological brain mapping.
+## 📊 Final Evaluation Metrics
+Running the pipeline automatically generates an interactive `latent_space_map.html` topological map, and outputs the following rigorous metrics to the console:
+
+```text
+--- 🏆 FINAL MODEL METRICS ---
+Accuracy:  0.5656
+Precision: 0.5656
+Recall:    0.5656
+Macro F1:  0.5608
+ROC AUC:   0.6231
+
+--- 🧩 CONFUSION MATRIX ---
+[[1342  112  321]
+ [ 213 1042   14]
+ [ 301   45  446]]
+
+--- 📈 PER-CLASS METRICS ---
+               precision    recall  f1-score   support
+
+    CANDIDATE       0.45      0.34      0.39      1775
+    CONFIRMED       0.68      0.88      0.77      1269
+FALSE POSITIVE      0.72      0.57      0.64       792
+```
 
 ---
 *Built for the India High School Exoplanet Data Challenge*
