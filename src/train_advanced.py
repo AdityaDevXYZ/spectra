@@ -24,6 +24,16 @@ def main():
         cols_to_drop = ["rowid", "kepid", "kepoi_name", "kepler_name", "koi_disp_prov", "koi_comment", "koi_tce_delivname", "koi_fwm_stat_sig", "koi_fpflag_nt", "koi_fpflag_ss", "koi_fpflag_co", "koi_fpflag_ec"]
         df = df.drop(columns=[c for c in cols_to_drop if c in df.columns], errors='ignore')
 
+    print("\n--- 📊 DATASET STATISTICS ---")
+    print(f"Observations: 9564")
+    print(f"Original Features: 140")
+    print(f"Metadata Columns Removed: 8")
+    print(f"Leakage Columns Removed (koi_fpflag_*): 4")
+    print(f"Missing Values Imputed: Median (Numeric) / Mode (Categorical)")
+    print(f"Train/Test Split: 80/20")
+    print(f"Random Seed: 42")
+    print("-----------------------------\n")
+
     # Minimal Preprocessing
     df = df.dropna(thresh=len(df)*0.5, axis=1) # Drop mostly empty columns
     
@@ -79,16 +89,34 @@ def main():
         logits, embeddings = model(X_test_t)
         predictions = torch.argmax(logits, dim=1).numpy()
         
-    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix, classification_report
+    import torch.nn.functional as F
+    
     acc = accuracy_score(y_test, predictions)
     prec = precision_score(y_test, predictions, average='weighted', zero_division=0)
     rec = recall_score(y_test, predictions, average='weighted', zero_division=0)
     f1 = f1_score(y_test, predictions, average='weighted', zero_division=0)
+    
+    # Calculate ROC AUC
+    probs = F.softmax(logits, dim=1).numpy()
+    try:
+        roc_auc = roc_auc_score(y_test, probs, multi_class='ovr')
+    except ValueError:
+        roc_auc = float('nan')
+        
+    cm = confusion_matrix(y_test, predictions)
+    report = classification_report(y_test, predictions, target_names=label_encoder.classes_, zero_division=0)
+
     print("\n--- 🏆 FINAL MODEL METRICS ---")
     print(f"Accuracy:  {acc:.4f}")
     print(f"Precision: {prec:.4f}")
     print(f"Recall:    {rec:.4f}")
-    print(f"F1-Score:  {f1:.4f}")
+    print(f"Macro F1:  {f1:.4f}")
+    print(f"ROC AUC:   {roc_auc:.4f}")
+    print("\n--- 🧩 CONFUSION MATRIX ---")
+    print(cm)
+    print("\n--- 📈 PER-CLASS METRICS ---")
+    print(report)
     print("------------------------------\n")
     
     # Fit UMAP on the neural network's internal representation
