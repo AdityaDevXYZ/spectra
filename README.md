@@ -89,23 +89,23 @@ Running the pipeline automatically generates an interactive `latent_space_map.ht
 
 ```text
 --- 🏆 FINAL MODEL METRICS ---
-Accuracy:  0.5656
-Precision: 0.5656
-Recall:    0.5656
-Macro F1:  0.5608
-ROC AUC:   0.6231
+Accuracy:  0.6017
+Precision: 0.6688
+Recall:    0.6017
+Macro F1:  0.6187
+ROC AUC:   0.7716
 
 --- 🧩 CONFUSION MATRIX ---
-[[1342  112  321]
- [ 213 1042   14]
- [ 301   45  446]]
+[[249  47  108]
+ [ 177 300   93]
+ [ 291   46  602]]
 
 --- 📈 PER-CLASS METRICS ---
                precision    recall  f1-score   support
 
-    CANDIDATE       0.45      0.34      0.39      1775
-    CONFIRMED       0.68      0.88      0.77      1269
-FALSE POSITIVE      0.72      0.57      0.64       792
+    CANDIDATE       0.35      0.62      0.44      404
+    CONFIRMED       0.76      0.53      0.62      570
+FALSE POSITIVE      0.75      0.64      0.69       939
 ```
 
 ---
