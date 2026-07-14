@@ -17,11 +17,15 @@ To solve the challenge of accurately filtering exoplanet signals from deep space
 
 ### 1. Dataset & Data Cleaning
 We utilized the Kepler KOI catalog to train our models.
-* **Dataset Statistics:** 9,564 observations, 140 original features.
-* **Leakage Removal:** We explicitly removed 4 target leakage columns (`koi_fpflag_nt`, `koi_fpflag_ss`, `koi_fpflag_co`, `koi_fpflag_ec`) because they are generated post-analysis. 
-* **Pruning:** 8 additional non-predictive metadata columns were removed. Remaining features were one-hot encoded (~17,000 features).
-* **Missing Values:** Imputed using the median for numeric and mode for categorical columns.
-* **Evaluation Split:** 80/20 Train/Test split.
+* **1. Dataset Statistics & Leakage Removal**
+* **Observations:** 9,564
+* **Original Features:** 140
+* **Metadata Columns Removed:** 8
+* **Leakage Columns Removed:** 4 (`koi_fpflag_nt`, `koi_fpflag_ss`, `koi_fpflag_co`, `koi_fpflag_ec`)
+* **Missing Values:** Imputed using Median (Numeric) / Mode (Categorical)
+* **Train/Test Split:** 80/20 (Random Seed: 42)
+
+A standard pandas pipeline applied to the Kepler dataset will easily achieve >99% accuracy. However, this is an illusion caused by target leakage. The 4 `koi_fpflag` columns are False Positive Flags determined *after* initial human/algorithmic analysis. We explicitly dropped them, intentionally sacrificing a 0.99 leaderboard score to achieve a mathematically honest **F1-Score of 0.5608**.
 
 ### 2. The 34-Digit Anomaly (Why Rust?)
 We used Rust (via the Polars framework) because the dataset contains malformed numeric values that require strict parsing before numerical preprocessing. At byte offset 500,6433 in `koi_quarters`, a 34-digit anomaly breaks standard parsing by forcing columns into object types. Our custom Rust engine enforces strict `i64` typing, isolating the overflow safely before it reaches the numerical scaler.
