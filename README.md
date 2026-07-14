@@ -1,6 +1,5 @@
 <div align="center">
   <h1>🌌 Spectra: Physics-Informed Exoplanet Detection</h1>
-  <p><b>India High School Exoplanet Data Challenge Submission</b></p>
   
   [![Python](https://img.shields.io/badge/Python-3.10-blue.svg)](https://python.org)
   [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C.svg)](https://pytorch.org/)
@@ -109,4 +108,4 @@ FALSE POSITIVE      0.75      0.64      0.69      939
 ```
 
 ---
-*Built for the India High School Exoplanet Data Challenge*
+*A branch of NECTRRA Ecosystem*
