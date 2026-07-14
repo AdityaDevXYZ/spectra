@@ -14,6 +14,23 @@
 To win the India High School Exoplanet Data Challenge, we abandoned the standard tabular data playbook. Instead of a basic Pandas + Scikit-learn pipeline, we bridged **systems-level software engineering** with **advanced astrophysics** to build an architecture that belongs in a research paper.
 
 This repository features a compiled **Rust data ingestion engine** and a **Physics-Informed Tabular Attention Network (PyTorch)** that physically validates its predictions against Keplerian geometry.
+Spectra is an enterprise-grade, end-to-end Machine Learning architecture designed to classify exoplanet candidates from the Kepler KOI dataset (9,564 samples, 140 features). Instead of relying on standard "black box" models, Spectra combines systems-level data engineering with a **Physics-Informed Neural Network (PINN)** to evaluate data through the lens of orbital mechanics.
+
+## 🔬 Scientific Methodology & Validation
+
+**1. Eradicating Target Leakage**
+A standard pandas pipeline applied to the Kepler dataset will easily achieve >99% accuracy. However, this is an illusion caused by target leakage. The `koi_fpflag_nt`, `koi_fpflag_ss`, `koi_fpflag_co`, and `koi_fpflag_ec` columns are False Positive Flags determined *after* initial analysis. Training on these columns is cheating. We explicitly dropped these 4 columns (along with 8 non-predictive metadata columns), intentionally sacrificing a 0.99 leaderboard score to achieve a mathematically honest **F1-Score of 0.5608**. 
+
+**2. The 34-Digit Anomaly (Why Rust?)**
+At byte offset 500,6433 in the `koi_quarters` column, the dataset contains the anomalous 34-digit integer `'1111111111111111111000000000000000'`. Standard Python `pandas` handles this by silently converting the entire column to a generic `Object` (String) type, which silently destroys downstream numerical scaling pipelines. Our custom **Rust / Polars** engine enforces strict `i64` typing, immediately catching the overflow and safely casting the anomaly to a null value via `.with_ignore_errors(true)` in milliseconds.
+
+**3. Why Attention over XGBoost?**
+Standard tree-based models (XGBoost, Random Forest) treat features via simple orthogonal splits. Exoplanet physics, however, relies on cross-feature relationships (e.g., the ratio of planetary radius `koi_prad` to stellar radius `koi_srad`). We implemented a `TabularAttentionNetwork` using PyTorch's `MultiheadAttention` because attention mechanisms explicitly compute these interaction weights, intrinsically mapping the physical correlations.
+
+**4. Physics-Informed Loss Penalties**
+Our custom loss function penalizes predictions that violate astrophysics:
+$$ \mathcal{L}_{total} = \mathcal{L}_{BCE}(y, \hat{y}) + \lambda \sum_{i} \text{Penalty}(x_i) $$
+We designed the architecture to penalize the network if it predicts a CONFIRMED planet where the transit depth geometrically contradicts the square of the radii ratio ($\Delta F / F \approx (R_p / R_*)^2$).
 
 ## 🏗️ The Three-Pillar Architecture
 
