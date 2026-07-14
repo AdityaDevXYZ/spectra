@@ -10,6 +10,7 @@ fn process_exoplanet_data(file_path: &str) -> PyResult<PyDataFrame> {
         .expect("Failed to read CSV file")
         .infer_schema(Some(100))
         .has_header(true)
+        .with_ignore_errors(true)
         .finish()
         .expect("Failed to parse CSV");
 
